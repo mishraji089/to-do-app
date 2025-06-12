@@ -1,0 +1,84 @@
+/* src/components/LoginPage.css */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1; /* Make it take available space */
+  padding: 20px;
+}
+
+.login-form-card {
+  background-color: var(--text-color-light);
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px var(--shadow-light);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.login-form-card h2 {
+  color: var(--primary-dark);
+  margin-bottom: 30px;
+  font-weight: 500;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-color-dark);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.form-group input:focus {
+  border-color: var(--primary-color);
+}
+
+.login-form-card .btn-primary {
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  margin-top: 15px;
+}
+
+.error-message {
+  color: var(--danger-color);
+  margin-top: 15px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.toggle-link {
+  margin-top: 20px;
+  font-size: 15px;
+  color: #666;
+}
+
+.toggle-link button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  font-size: 15px;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.toggle-link button:hover {
+  color: var(--primary-dark);
+}

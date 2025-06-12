@@ -1,56 +1,81 @@
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  margin: 0;
-  padding: 20px;
+/* src/App.css */
+.App {
+  flex-grow: 1; /* Allow content to grow */
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
 }
 
-.App {
-  background-color: #fff;
-  padding: 30px;
+.container {
+  background-color: var(--text-color-light);
+  padding: 40px;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px var(--shadow-light);
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
   text-align: center;
+  margin-top: 20px; /* Space from navbar */
 }
 
 h1 {
-  color: #333;
-  margin-bottom: 25px;
+  color: var(--primary-dark);
+  margin-bottom: 30px;
+  font-weight: 500;
 }
 
 .todo-form {
   display: flex;
-  gap: 10px;
+  gap: 15px;
   margin-bottom: 30px;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
 }
 
 .todo-form input[type="text"] {
   flex-grow: 1;
   padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
   font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s ease-in-out;
 }
 
-.todo-form button {
-  padding: 12px 20px;
-  background-color: #007bff;
-  color: white;
+.todo-form input[type="text"]:focus {
+  border-color: var(--primary-color);
+}
+
+.btn {
+  padding: 12px 25px;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
-  transition: background-color 0.2s;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+  color: var(--text-color-light);
 }
 
-.todo-form button:hover {
-  background-color: #0056b3;
+.btn-primary {
+  background-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  padding: 8px 15px; /* Smaller for delete button */
+  font-size: 14px;
+}
+
+.btn-danger:hover {
+  background-color: #c0392b;
+  transform: translateY(-1px);
 }
 
 .todo-list {
@@ -62,39 +87,89 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f9f9f9;
-  border: 1px solid #eee;
-  padding: 15px;
-  margin-bottom: 10px;
+  background-color: #fefefe;
+  border: 1px solid var(--border-color);
+  padding: 15px 20px;
+  margin-bottom: 12px;
   border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease-in-out;
+}
+
+.todo-list li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
 .todo-list li span {
   flex-grow: 1;
   text-align: left;
   cursor: pointer;
-  font-size: 18px;
-  color: #555;
-  padding-right: 10px; /* Space between text and button */
+  font-size: 17px;
+  color: var(--text-color-dark);
+  padding-right: 15px;
 }
 
 .todo-list li.completed span {
   text-decoration: line-through;
-  color: #999;
+  color: #888;
+  font-style: italic;
 }
 
-.delete-button {
-  background-color: #dc3545;
-  color: white;
-  border: none;
+/* --- Navbar Styling --- */
+.navbar {
+  background-color: var(--primary-dark);
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-brand {
+  color: var(--text-color-light);
+  font-size: 24px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.navbar-links .nav-link {
+  color: var(--text-color-light);
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: 400;
   padding: 8px 12px;
   border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease-in-out;
 }
 
-.delete-button:hover {
-  background-color: #c82333;
+.navbar-links .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.navbar-links .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.3);
+    font-weight: 500;
+}
+
+.navbar .username {
+  color: var(--accent-color);
+  font-weight: 500;
+  margin-right: 15px;
+}
+
+/* src/App.css */
+/* ... (existing CSS) ... */
+
+.success-message {
+  color: var(--primary-color);
+  margin-top: 15px;
+  font-size: 15px;
+  font-weight: 500;
 }

@@ -1,32 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import './App.css'; // We'll add some basic CSS later
+import axios from 'axios'; // Using axios for simpler request configuration
+import './App.css';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import LoginPage from './components/LoginPage';
+import Navbar from './components/Navbar';
+import PrivateRoute from './PrivateRoute';
 
-function App() {
+// --- TodoList Component (Moved for clarity, could be in its own file) ---
+function TodoListContent() {
   const [todos, setTodos] = useState([]);
   const [newTodoDescription, setNewTodoDescription] = useState('');
-  const API_URL = '/api/todos'; // Proxied to http://localhost:8080/api/todos
+  const { getAuthHeader } = useAuth(); // Get auth header from context
 
-  // Fetch todos from the backend when the component mounts
+  const API_URL = '/api/todos';
+
+  // Fetch todos from the backend when the component mounts or auth changes
   useEffect(() => {
     fetchTodos();
-  }, []);
+  }, [getAuthHeader]); // Rerun when auth changes (e.g., login/logout)
 
   const fetchTodos = async () => {
     try {
-      const response = await fetch(API_URL);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setTodos(data);
+      const response = await axios.get(API_URL, { headers: getAuthHeader() });
+      setTodos(response.data);
     } catch (error) {
       console.error("Error fetching todos:", error);
+      // Handle unauthorized errors, maybe redirect to login
+      if (error.response && error.response.status === 401) {
+        // This should be handled by PrivateRoute, but good to have here too
+        console.log("Unauthorized, please login.");
+      }
     }
   };
 
   const handleAddTodo = async (e) => {
-    e.preventDefault(); // Prevent default form submission
-    if (!newTodoDescription.trim()) return; // Don't add empty todos
+    e.preventDefault();
+    if (!newTodoDescription.trim()) return;
 
     const newTodo = {
       description: newTodoDescription,
@@ -34,19 +44,9 @@ function App() {
     };
 
     try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newTodo),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const addedTodo = await response.json();
-      setTodos([...todos, addedTodo]); // Add the new todo to the state
-      setNewTodoDescription(''); // Clear input field
+      const response = await axios.post(API_URL, newTodo, { headers: getAuthHeader() });
+      setTodos([...todos, response.data]);
+      setNewTodoDescription('');
     } catch (error) {
       console.error("Error adding todo:", error);
     }
@@ -59,18 +59,8 @@ function App() {
     const updatedTodo = { ...todoToUpdate, completed: !todoToUpdate.completed };
 
     try {
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedTodo),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const fetchedUpdatedTodo = await response.json(); // Get the updated todo from backend
-      setTodos(todos.map(todo => (todo.id === id ? fetchedUpdatedTodo : todo)));
+      const response = await axios.put(`${API_URL}/${id}`, updatedTodo, { headers: getAuthHeader() });
+      setTodos(todos.map(todo => (todo.id === id ? response.data : todo)));
     } catch (error) {
       console.error("Error updating todo:", error);
     }
@@ -78,48 +68,63 @@ function App() {
 
   const handleDeleteTodo = async (id) => {
     try {
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) {
-        // For DELETE, 204 No Content is common and means success
-        if (response.status !== 204) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-      }
-      setTodos(todos.filter(todo => todo.id !== id)); // Remove from state
+      await axios.delete(`${API_URL}/${id}`, { headers: getAuthHeader() });
+      setTodos(todos.filter(todo => todo.id !== id));
     } catch (error) {
       console.error("Error deleting todo:", error);
     }
   };
 
   return (
-    <div className="App">
-      <h1>Todo List</h1>
+    <div className="container">
+      <h1>My Todos</h1>
 
       <form onSubmit={handleAddTodo} className="todo-form">
         <input
           type="text"
           value={newTodoDescription}
           onChange={(e) => setNewTodoDescription(e.target.value)}
-          placeholder="Add a new todo..."
+          placeholder="What needs to be done?"
         />
-        <button type="submit">Add Todo</button>
+        <button type="submit" className="btn btn-primary">Add Todo</button>
       </form>
 
       <ul className="todo-list">
-        {todos.map((todo) => (
-          <li key={todo.id} className={todo.completed ? 'completed' : ''}>
-            <span onClick={() => handleToggleCompleted(todo.id)}>
-              {todo.description}
-            </span>
-            <button onClick={() => handleDeleteTodo(todo.id)} className="delete-button">
-              Delete
-            </button>
-          </li>
-        ))}
+        {todos.length === 0 ? (
+          <p>No todos yet. Add one!</p>
+        ) : (
+          todos.map((todo) => (
+            <li key={todo.id} className={todo.completed ? 'completed' : ''}>
+              <span onClick={() => handleToggleCompleted(todo.id)}>
+                {todo.description}
+              </span>
+              <button onClick={() => handleDeleteTodo(todo.id)} className="btn btn-danger">
+                Delete
+              </button>
+            </li>
+          ))
+        )}
       </ul>
     </div>
+  );
+}
+
+// --- Main App Component ---
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <Navbar />
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route element={<PrivateRoute />}>
+            <Route path="/" element={<TodoListContent />} />
+          </Route>
+          {/* Fallback for unknown routes */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthProvider>
+    </Router>
   );
 }
 
